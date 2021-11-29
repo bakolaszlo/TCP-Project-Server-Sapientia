@@ -2,15 +2,16 @@
 #include <vector>
 
 #include "SysThread.h"
+#include "ClientInfo.h"
 
 class Networking : public SysThread
 {
-	SOCKET socket;
+	ClientInfo clientInfo;
 	std::vector<Networking*>* threadList;
 	CRITICAL_SECTION* critical_section;
 	
 public:
-	Networking(SOCKET socket, std::vector<Networking*>* threadList, CRITICAL_SECTION* critical_section);
+	Networking(std::vector<Networking*>* threadList, CRITICAL_SECTION* critical_section, ClientInfo &clientInfo);
 	void run(void);
 };
 

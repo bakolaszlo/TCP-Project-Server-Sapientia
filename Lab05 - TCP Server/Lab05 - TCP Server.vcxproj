@@ -139,11 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Networking.cpp" />
     <ClCompile Include="SysThread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="Networking.h" />
     <ClInclude Include="SysThread.h" />
   </ItemGroup>

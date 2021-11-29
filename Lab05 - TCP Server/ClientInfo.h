@@ -1,16 +1,18 @@
 #pragma once
-#include <WinSock2.h>
+#include <winsock.h>
 class ClientInfo
 {
 	
 
 public:
+	ClientInfo() {};
 	ClientInfo(SOCKET clientSocket, sockaddr_in clientAddr)
 	{
 		this->clientAddr = clientAddr;
 		this->clientSocket = clientSocket;
 	}
+
 	SOCKET clientSocket;
-	struct sockaddr_in clientAddr;
+	sockaddr_in clientAddr;
 };
 
