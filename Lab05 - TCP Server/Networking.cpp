@@ -16,11 +16,128 @@ enum PROTOCOL {
 	QUIT = 'Q',
 	REQUESTRESPONSE = 'R',
 	FILLER = '>',
+	START= 'S',
+	CONTINUATION = 'C',
+	END = 'E',
 };
 
 void Networking::cleanString(std::string& in)
 {
 	in.erase(remove(in.begin(), in.end(), PROTOCOL::FILLER), in.end());
+}
+
+void Networking::workOnRequest(char* recBuf)
+{
+	char host[7];
+
+	host[0] = 127;
+	host[1] = '0';
+	host[2] = '0';
+	host[3] = 1;
+	host[4] = PROTOCOL::FILLER;
+	host[5] = PROTOCOL::END;
+	host[6] = 0;
+	std::string response(host);
+	
+	if (recBuf[4] == PROTOCOL::LOGIN && clientInfo.loggedIn == false)
+	{
+		std::string input(recBuf);
+		std::string username = input.substr(6, 12);
+		cleanString(username);
+		std::string password = input.substr(6 + 12, 12);
+		cleanString(password);
+		ClientManager cm(&clientInfo);
+		response[4] = PROTOCOL::REQUESTRESPONSE;
+
+		//if login was succesfull
+		if (cm.Login(username, password))
+		{
+			response.append("1");
+		}
+		else {
+			response.append("0");
+		}
+		//Login();
+	}
+	else if (!clientInfo.loggedIn)
+	{
+		response[4] = PROTOCOL::REQUESTRESPONSE;
+		response.append("You need to be logged in for further actions.");
+	}
+	else
+	{
+		//further actions here
+	}
+
+
+	// send( ) may not be able to send the complete data in one go.
+	// So try sending the data in multiple requests
+	int nCntSend = 0;
+	std::string result = splitResponse(response);
+	const char* pBuffer = result.c_str();
+	int bytesSent = 0;
+	size_t messageSize = 256;
+	const int messageTotalSize = response.size();
+
+	while (bytesSent <= result.size())
+	{
+		nCntSend = send(clientInfo.clientSocket, pBuffer, messageSize, 0);
+			
+		
+		if (nCntSend == -1)
+		{
+			std::cout << "Error sending the data to " << inet_ntoa(clientInfo.clientAddr.sin_addr) << std::endl;
+			clientInfo.loggedIn = false;
+			break;
+		}
+		//if (nCntSend == iResult)
+		//	break;
+
+		pBuffer += nCntSend;
+		bytesSent += nCntSend;
+		//iResult -= nCntSend;
+	}
+}
+
+std::string Networking::splitResponse(std::string& response)
+{
+	size_t messageLength = 256;
+	std::string result;
+	std::string placeHolder = response.substr(0, 6);
+	response.erase(0, 6);
+	if (response.size() <= 250)
+	{
+		placeHolder[5] = PROTOCOL::END;
+	}
+	else
+	{
+		placeHolder[5] = PROTOCOL::START;
+	}
+
+	result.append(placeHolder);
+
+	std::string temp = response.substr(0, 250);
+	response.erase(0, 250);
+	
+	result.append(temp);
+
+	placeHolder[5] = PROTOCOL::CONTINUATION;
+
+	while (response.size() != 0)
+	{
+		temp = response.substr(0, 250);
+		response.erase(0, 250);
+
+		if (response.size() == 0)
+		{
+			placeHolder[5] = PROTOCOL::END;
+		}
+
+		result.append(placeHolder);
+		result.append(temp);
+	}
+
+	return result;
 }
 
 Networking::Networking(std::vector<Networking*>* threadList, CRITICAL_SECTION* critical_section,ClientInfo &clientInfo)
@@ -33,15 +150,8 @@ Networking::Networking(std::vector<Networking*>* threadList, CRITICAL_SECTION* c
 void Networking::run(void)
 {
 	int iResult;
-	const int BufLen = 1024;
+	const int BufLen = 256;
 	char recBuf[BufLen];
-	char host[6];
-	std::string response;
-	host[0] = 127;
-	host[1] = '0';
-	host[2] = '0';
-	host[3] = 1;
-	host[5] = 0;
 
 	while (1)
 	{
@@ -51,54 +161,17 @@ void Networking::run(void)
 			recBuf[iResult] = '\0';
 			std::cout << "Received " << recBuf << " from " << inet_ntoa(clientInfo.clientAddr.sin_addr) << std::endl;
 
+			
 			// Convert the string to upper case
 			recBuf[4] = std::toupper(recBuf[4]);
-
-			if (recBuf[4] == PROTOCOL::LOGIN)
-			{
-				std::string input(recBuf);
-				std::string username = input.substr(5, 12);
-				cleanString(username);
-				std::string password = input.substr(5 + 12, 12);
-				cleanString(password);
-				ClientManager cm(clientInfo);
-				host[4] = PROTOCOL::REQUESTRESPONSE;
-				response = std::string(host);
-
-				//if login was succesfull
-				if (cm.Login(username, password))
-				{
-					response.append("Logged in succesfully.");
-				}
-				else {
-					response.append("Login attempt failed.");
-				}
-				//Login();
-			}
 			if (recBuf[4] == PROTOCOL::QUIT)
 			{
 				closesocket(clientInfo.clientSocket);
 				return;
 			}
-
-			// send( ) may not be able to send the complete data in one go.
-			// So try sending the data in multiple requests
-			int nCntSend = 0;
-			const char* pBuffer = response.c_str();
-
-			while ((nCntSend  != 256))
+			else
 			{
-				nCntSend = send(clientInfo.clientSocket, pBuffer, 256, 0);
-				if (nCntSend == -1)
-				{
-					std::cout << "Error sending the data to " << inet_ntoa(clientInfo.clientAddr.sin_addr) << std::endl;
-					break;
-				}
-				//if (nCntSend == iResult)
-				//	break;
-
-				pBuffer += nCntSend;
-				//iResult -= nCntSend;
+				workOnRequest(recBuf);
 			}
 			
 		}

@@ -1,6 +1,7 @@
 #include "ClientManager.h"
 
-//bool ClientManager::usersInitialized = false;
+bool ClientManager::usersInitialized = false;
+std::map<std::string, std::string> ClientManager::users;
 bool ClientManager::initializeUsers()
 {
 
@@ -11,7 +12,7 @@ bool ClientManager::initializeUsers()
 		std::vector<std::string> output = split(line, delimiter);
 		users.emplace(output[0], output[1]);
 	}
-	//usersInitialized = true;
+	usersInitialized = true;
 	return true;
 }
 
@@ -27,11 +28,10 @@ std::vector<std::string> ClientManager::split(const std::string& str, char delim
 	return strings;
 }
 
-ClientManager::ClientManager(ClientInfo& clientInfo)
+ClientManager::ClientManager(ClientInfo *clientInfo)
 {
 	this->clientInfo = clientInfo;
-	
-		initializeUsers();
+	if(!usersInitialized) initializeUsers();
 }
 
 bool ClientManager::Login(std::string& username, std::string& password)
@@ -44,7 +44,8 @@ bool ClientManager::Login(std::string& username, std::string& password)
 	{
 		if (users[username] == password)
 		{
-			clientInfo.username = username;
+			clientInfo->username = username;
+			clientInfo->loggedIn = true;
 			return true;
 		}
 		return false;

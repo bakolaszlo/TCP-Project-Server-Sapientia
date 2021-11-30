@@ -16,5 +16,6 @@ public:
 	SOCKET clientSocket;
 	sockaddr_in clientAddr;
 	std::string username;
+	bool loggedIn = false;;
 };
 

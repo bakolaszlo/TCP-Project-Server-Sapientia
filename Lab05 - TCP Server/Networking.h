@@ -10,6 +10,8 @@ class Networking : public SysThread
 	std::vector<Networking*>* threadList;
 	CRITICAL_SECTION* critical_section;
 	void cleanString(std::string& in);
+	void workOnRequest(char * recBuf);
+	std::string splitResponse(std::string& response);
 public:
 	Networking(std::vector<Networking*>* threadList, CRITICAL_SECTION* critical_section, ClientInfo &clientInfo);
 	void run(void);
