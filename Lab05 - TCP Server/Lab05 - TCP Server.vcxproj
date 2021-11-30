@@ -140,14 +140,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ClientInfo.cpp" />
+    <ClCompile Include="ClientManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Networking.cpp" />
     <ClCompile Include="SysThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClientInfo.h" />
+    <ClInclude Include="ClientManager.h" />
     <ClInclude Include="Networking.h" />
     <ClInclude Include="SysThread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="clients.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

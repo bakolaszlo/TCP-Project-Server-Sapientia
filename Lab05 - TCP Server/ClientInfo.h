@@ -1,5 +1,6 @@
 #pragma once
 #include <winsock.h>
+#include <string>
 class ClientInfo
 {
 	
@@ -14,5 +15,6 @@ public:
 
 	SOCKET clientSocket;
 	sockaddr_in clientAddr;
+	std::string username;
 };
 

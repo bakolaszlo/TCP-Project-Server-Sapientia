@@ -6,6 +6,7 @@
 #include <vector>
 #include "ClientInfo.h"
 #include <iostream>
+#include "ClientManager.h"
 
 #pragma comment(lib, "ws2_32.lib")
 CRITICAL_SECTION CriticalSection;
@@ -57,6 +58,7 @@ int main() {
 		WSACleanup();
 		return 1;
 	}
+
 	//----------------------
 	// Create a SOCKET for accepting incoming requests.
 	//----------------------

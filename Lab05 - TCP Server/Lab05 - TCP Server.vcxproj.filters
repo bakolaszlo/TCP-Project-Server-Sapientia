@@ -27,6 +27,9 @@
     <ClCompile Include="ClientInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ClientManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SysThread.h">
@@ -38,5 +41,13 @@
     <ClInclude Include="ClientInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ClientManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="clients.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
