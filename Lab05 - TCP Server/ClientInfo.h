@@ -1,6 +1,7 @@
 #pragma once
 #include <winsock.h>
 #include <string>
+#include <map>
 class ClientInfo
 {
 	
@@ -16,6 +17,7 @@ public:
 	SOCKET clientSocket;
 	sockaddr_in clientAddr;
 	std::string username;
-	bool loggedIn = false;;
+	bool loggedIn = false;
+	std::map<std::string, bool> acceptedFiles;
 };
 
